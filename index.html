@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Портрет ценностей — Мягкая математика</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  color: #2d3436;
+  min-height: 100vh;
+  padding: 20px;
+  position: relative;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(168, 230, 207, 0.15) 0%, transparent 45%),
+    radial-gradient(circle at 100% 0%, rgba(212, 197, 249, 0.15) 0%, transparent 45%),
+    radial-gradient(circle at 0% 100%, rgba(255, 211, 182, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 100% 100%, rgba(255, 234, 167, 0.12) 0%, transparent 45%),
+    #fef9f3;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(168, 230, 207, 0.06) 1px, transparent 1px),
+    radial-gradient(circle at 80% 70%, rgba(212, 197, 249, 0.06) 1px, transparent 1px);
+  background-size: 60px 60px, 80px 80px;
+  background-color: #fef9f3;
+}
+
+body::before {
+  content: "Мягкая математика · ОГЭ/ЕГЭ · Олимпиады · ВПР · vk.com/smartskillsmaria";
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(-22deg);
+  font-size: 30px; font-weight: 900;
+  color: rgba(108, 92, 231, 0.04);
+  white-space: nowrap;
+  pointer-events: none; z-index: 0;
+  user-select: none; letter-spacing: 3px;
+  font-family: 'Arial Black', 'Arial', sans-serif;
+}
+
+.container { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+
+.screen { display: none; animation: fadeIn 0.5s ease; }
+.screen.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes barGrow {
+  from { width: 0; }
+}
+
+.btn {
+  display: inline-block;
+  background: #a8e6cf; color: #2d3436;
+  padding: 14px 36px; border-radius: 60px;
+  font-size: 16px; font-weight: 700;
+  border: none; cursor: pointer;
+  box-shadow: 0 8px 24px rgba(168, 230, 207, 0.6);
+  transition: all 0.3s ease;
+  font-family: 'Arial', sans-serif;
+  margin: 5px;
+}
+.btn:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(168, 230, 207, 0.8); }
+.btn-secondary { background: #d4c5f9; color: #4a3f7a; box-shadow: 0 8px 24px rgba(212, 197, 249, 0.6); }
+.btn-secondary:hover { box-shadow: 0 12px 32px rgba(212, 197, 249, 0.8); }
+.btn-small { padding: 10px 22px; font-size: 14px; border-radius: 30px; }
+.btn-gold { background: #ffeaa7; color: #7a5c1e; box-shadow: 0 8px 24px rgba(255, 234, 167, 0.6); }
+.btn-gold:hover { box-shadow: 0 12px 32px rgba(255, 234, 167, 0.9); }
+
+/* СТАРТОВЫЙ ЭКРАН */
+.start-card {
+  background: linear-gradient(135deg, #d4c5f9, #bae1ff);
+  color: #4a3f7a;
+  padding: 50px 40px;
+  border-radius: 30px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(212, 197, 249, 0.4);
+}
+.start-card h1 { font-size: 38px; margin-bottom: 12px; }
+.start-card .subtitle { font-size: 18px; opacity: 0.95; margin-bottom: 30px; line-height: 1.6; }
+
+.ad-block {
+  background: rgba(255, 255, 255, 0.6);
+  border-left: 4px solid #a8e6cf;
+  padding: 15px 20px; margin-top: 25px;
+  border-radius: 12px; font-size: 14px;
+  line-height: 1.7; text-align: left;
+  color: #4a3f7a;
+}
+.ad-block.light { background: #f8f9fa; border-left: 4px solid #a8e6cf; color: #636e72; }
+.ad-block a { color: #6c5ce7; font-weight: 700; text-decoration: underline; display: inline-block; margin: 2px 0; }
+.ad-block a:hover { opacity: 0.8; }
+
+/* ШАПКА */
+.screen-header {
+  background: #fff; padding: 18px 25px;
+  border-radius: 60px; margin-bottom: 20px;
+  display: flex; justify-content: space-between;
+  align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  flex-wrap: wrap; gap: 10px;
+}
+.screen-header h2 { font-size: 20px; color: #6c5ce7; }
+.screen-header .progress-info { font-size: 15px; font-weight: 700; color: #e17055; }
+
+/* ВЫБОР ТЕСТА */
+.test-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.test-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 30px 25px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 3px solid transparent;
+  text-align: center;
+}
+.test-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 50px rgba(108, 92, 231, 0.2);
+  border-color: #a8e6cf;
+}
+.test-card .test-icon { font-size: 60px; margin-bottom: 15px; }
+.test-card h3 { font-size: 20px; color: #6c5ce7; margin-bottom: 10px; }
+.test-card .test-desc { font-size: 14px; color: #636e72; line-height: 1.6; margin-bottom: 15px; }
+.test-card .test-meta {
+  font-size: 13px; color: #4a9d7f; font-weight: 700;
+  background: #e8f8f1; padding: 6px 14px; border-radius: 30px;
+  display: inline-block;
+}
+
+/* ВОПРОСЫ */
+.question-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 35px 30px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+  min-height: 320px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.question-number {
+  font-size: 14px; color: #b2bec3; font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+.question-text {
+  font-size: 22px; color: #2d3436;
+  line-height: 1.5;
+  margin-bottom: 30px;
+  font-weight: 700;
+}
+
+.scale-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.scale-btn {
+  flex: 1;
+  min-width: 60px;
+  max-width: 100px;
+  padding: 15px 10px;
+  background: #f8f9fa;
+  border: 3px solid #dfe6e9;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #636e72;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Arial', sans-serif;
+}
+.scale-btn:hover {
+  border-color: #a8e6cf;
+  transform: translateY(-3px);
+  background: #e8f8f1;
+}
+.scale-btn.selected {
+  background: #a8e6cf;
+  border-color: #55b88e;
+  color: #2d3436;
+  transform: scale(1.05);
+}
+
+.scale-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #b2bec3;
+  margin-top: 15px;
+  padding: 0 10px;
+}
+
+/* ПРОГРЕСС-БАР */
+.progress-bar-top {
+  width: 100%; height: 10px;
+  background: #f0edff;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.progress-fill-top {
+  height: 100%;
+  background: linear-gradient(90deg, #a8e6cf, #55b88e);
+  border-radius: 10px;
+  transition: width 0.5s ease;
+  width: 0;
+}
+
+/* РЕЗУЛЬТАТ — ПОРТРЕТ */
+.portrait-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 40px 30px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+}
+.portrait-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.portrait-header .portrait-emoji { font-size: 80px; margin-bottom: 15px; }
+.portrait-header h1 {
+  font-size: 32px; color: #6c5ce7;
+  margin-bottom: 10px;
+}
+.portrait-header .portrait-subtitle {
+  font-size: 17px; color: #636e72;
+  line-height: 1.6;
+}
+
+.values-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 25px 0;
+}
+.value-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  animation: barGrow 0.6s ease;
+}
+.value-row.top-value {
+  background: linear-gradient(135deg, #e8f8f1, #d4f0e2);
+  border: 2px solid #a8e6cf;
+}
+.value-row .value-emoji { font-size: 28px; flex-shrink: 0; }
+.value-row .value-info { flex: 1; }
+.value-row .value-name {
+  font-size: 16px; font-weight: 700;
+  color: #2d3436; margin-bottom: 5px;
+}
+.value-row .value-bar {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.value-row .value-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #a8e6cf, #55b88e);
+  border-radius: 10px;
+  transition: width 1s ease;
+}
+.value-row .value-score {
+  font-size: 14px; font-weight: 700;
+  color: #4a9d7f;
+  flex-shrink: 0;
+  min-width: 50px;
+  text-align: right;
+}
+
+.portrait-description {
+  background: linear-gradient(135deg, #f0edff, #e8e0ff);
+  border-radius: 20px;
+  padding: 25px;
+  margin-top: 25px;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #2d3436;
+}
+.portrait-description h3 {
+  color: #6c5ce7;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+/* КНОПКИ */
+.controls {
+  display: flex; gap: 12px;
+  justify-content: center; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+/* РЕКЛАМА */
+.ad-block.light {
+  text-align: center;
+  border-left: none;
+  border-top: 4px solid #a8e6cf;
+  margin-top: 30px;
+}
+
+/* АДАПТИВ */
+@media (max-width: 700px) {
+  body::before { font-size: 18px; }
+  .start-card { padding: 35px 25px; }
+  .start-card h1 { font-size: 28px; }
+  .question-text { font-size: 18px; }
+  .scale-btn { min-width: 50px; padding: 12px 8px; font-size: 16px; }
+  .portrait-header h1 { font-size: 24px; }
+  .value-row { padding: 12px 15px; }
+  .value-row .value-emoji { font-size: 22px; }
+  .value-row .value-name { font-size: 14px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ============================================================
+       ЭКРАН 1: СТАРТ
+       ============================================================ -->
+  <div id="start-screen" class="screen active">
+    <div class="start-card">
+      <h1>🧭 Портрет ценностей</h1>
+      <p class="subtitle">
+        Узнай, что для тебя по-настоящему важно!<br>
+        Выбери один из трёх тестов и построй свой портрет.
+      </p>
+      <button type="button" class="btn" onclick="goToTestSelection()">🚀 Начать</button>
+
+      <div class="ad-block">
+        <p><strong>Хочешь узнать себя лучше?</strong></p>
+        <p>Приходи в «Мягкую математику»! Soft Skills, целеполагание и финансовая грамотность.</p>
+        <a href="https://vk.com/smartskillsmaria" target="_blank" rel="noopener">📢 Подписывайся на группу</a><br>
+        <a href="https://vk.com/im/convo/-229273902?entrypoint=community_page&tab=all" target="_blank" rel="noopener">✉️ Пиши Марии Абрамовой</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       ЭКРАН 2: ВЫБОР ТЕСТА
+       ============================================================ -->
+  <div id="selection-screen" class="screen">
+    <div class="screen-header">
+      <h2>Выбери тест</h2>
+      <div class="progress-info">Шаг 1 из 3</div>
+    </div>
+
+    <div class="test-options">
+
+      <div class="test-card" onclick="startTest('schwartz')">
+        <div class="test-icon">🎭</div>
+        <h3>Портретные ценности</h3>
+        <p class="test-desc">
+          Оцени, насколько ты похож на персонажей с разными ценностями. Методика Ш. Шварца в адаптации для детей.
+        </p>
+        <div class="test-meta">20 вопросов · 5 минут</div>
+      </div>
+
+      <div class="test-card" onclick="startTest('rezapkina')">
+        <div class="test-icon">🌳</div>
+        <h3>Иерархия жизненных ценностей</h3>
+        <p class="test-desc">
+          Оцени, что для тебя важно в жизни: здоровье, семья, друзья, учёба, творчество, деньги, свобода, помощь.
+        </p>
+        <div class="test-meta">40 вопросов · 10 минут</div>
+      </div>
+
+      <div class="test-card" onclick="startTest('lvi')">
+        <div class="test-icon">🌟</div>
+        <h3>Жизненные ценности</h3>
+        <p class="test-desc">
+          Оцени, как часто ты руководствуешься этими ценностями в жизни. Опросник LVI в адаптации для детей.
+        </p>
+        <div class="test-meta">21 вопрос · 7 минут</div>
+      </div>
+
+    </div>
+
+    <div class="controls">
+      <button type="button" class="btn btn-secondary btn-small" onclick="goBackToStart()">← Назад</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       ЭКРАН 3: ВОПРОСЫ
+       ============================================================ -->
+  <div id="question-screen" class="screen">
+    <div class="screen-header">
+      <h2 id="test-title">Тест</h2>
+      <div class="progress-info">
+        <span id="current-q">1</span> из <span id="total-q">20</span>
+      </div>
+    </div>
+
+    <div class="progress-bar-top">
+      <div class="progress-fill-top" id="question-progress"></div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-number" id="question-number">ВОПРОС 1</div>
+      <div class="question-text" id="question-text">Загрузка...</div>
+
+      <div class="scale-options" id="scale-options"></div>
+
+      <div class="scale-labels" id="scale-labels">
+        <span>Совсем не похож</span>
+        <span>Очень похож</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button type="button" class="btn btn-secondary btn-small" id="back-q-btn" onclick="prevQuestion()">← Назад</button>
+      <button type="button" class="btn btn-small" id="next-q-btn" onclick="nextQuestion()" disabled>Далее →</button>
+      <button type="button" class="btn btn-secondary btn-small" onclick="restartTest()">🔄 Заново</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       ЭКРАН 4: РЕЗУЛЬТАТ — ПОРТРЕТ
+       ============================================================ -->
+  <div id="result-screen" class="screen">
+    <div class="portrait-card">
+      <div class="portrait-header">
+        <div class="portrait-emoji" id="portrait-emoji">🌟</div>
+        <h1 id="portrait-title">Твой портрет ценностей</h1>
+        <p class="portrait-subtitle" id="portrait-subtitle"></p>
+      </div>
+
+      <div class="values-list" id="values-list"></div>
+
+      <div class="portrait-description" id="portrait-description"></div>
+
+      <div class="controls" style="margin-top: 25px;">
+        <button type="button" class="btn btn-gold" onclick="sharePortrait()">📤 Поделиться</button>
+        <button type="button" class="btn btn-secondary" onclick="goToTestSelection()">🧭 Пройти другой тест</button>
+        <button type="button" class="btn" onclick="restartAll()">🔄 Заново</button>
+      </div>
+
+      <div class="ad-block light">
+        <p><strong>Ты построил свой портрет ценностей! Развивай их в «Мягкой математике»!</strong></p>
+        <p>Курсы для 1–11 классов. Soft Skills, целеполагание, финансовая грамотность.</p>
+        <a href="https://vk.com/smartskillsmaria" target="_blank" rel="noopener">📢 Подписывайся на группу</a><br>
+        <a href="https://vk.com/im/convo/-229273902?entrypoint=community_page&tab=all" target="_blank" rel="noopener">✉️ Пиши Марии Абрамовой</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// ДАННЫЕ ТЕСТОВ
+// ============================================================
+const tests = {
+  schwartz: {
+    title: "🎭 Портретные ценности (Шварц)",
+    scale: [1, 2, 3, 4, 5, 6],
+    labels: ["Совсем не похож", "Очень похож"],
+    questions: [
+      { text: "Ему важно быть лучшим в учёбе", value: "achievement", emoji: "🏆" },
+      { text: "Для неё важно помогать другим", value: "kindness", emoji: "❤️" },
+      { text: "Он любит придумывать новое", value: "creativity", emoji: "🎨" },
+      { text: "Ей важно, чтобы всё было по правилам", value: "safety", emoji: "🛡️" },
+      { text: "Он хочет быть главным в компании", value: "power", emoji: "👑" },
+      { text: "Ей нравится узнавать новое", value: "knowledge", emoji: "📚" },
+      { text: "Для него важно иметь много друзей", value: "friendship", emoji: "👫" },
+      { text: "Она любит мечтать о будущем", value: "dreams", emoji: "🌟" },
+      { text: "Он готов защищать слабых", value: "justice", emoji: "⚖️" },
+      { text: "Ей важно, чтобы её хвалили", value: "recognition", emoji: "🎉" },
+      { text: "Он любит решать сложные задачи", value: "intellect", emoji: "🧠" },
+      { text: "Для неё важна семья", value: "family", emoji: "👨‍👩‍👧" },
+      { text: "Он любит путешествовать", value: "freedom", emoji: "✈️" },
+      { text: "Ей нравится делать подарки", value: "generosity", emoji: "🎁" },
+      { text: "Он хочет заработать много денег", value: "finance", emoji: "💰" },
+      { text: "Ей важно быть здоровой", value: "health", emoji: "💪" },
+      { text: "Он любит порядок вокруг", value: "order", emoji: "📐" },
+      { text: "Ей нравится выступать на сцене", value: "expression", emoji: "🎤" },
+      { text: "Он готов прийти на помощь", value: "support", emoji: "🤝" },
+      { text: "Ей важно быть честной", value: "honesty", emoji: "✨" }
+    ]
+  },
+  rezapkina: {
+    title: "🌳 Иерархия жизненных ценностей (Резапкина)",
+    scale: [1, 0, -1],
+    scaleLabels: ["Соответствует", "Не соответствует"],
+    labels: ["Соответствует", "Не соответствует"],
+    questions: [
+      { text: "Я стараюсь заниматься спортом", value: "health", emoji: "💪" },
+      { text: "Я правильно питаюсь", value: "health", emoji: "💪" },
+      { text: "Я высыпаюсь", value: "health", emoji: "💪" },
+      { text: "Я берегу своё здоровье", value: "health", emoji: "💪" },
+      { text: "Я редко болею", value: "health", emoji: "💪" },
+      { text: "Я люблю проводить время с семьёй", value: "family", emoji: "👨‍👩‍👧" },
+      { text: "Я помогаю родителям", value: "family", emoji: "👨‍👩‍👧" },
+      { text: "Я скучаю по дому", value: "family", emoji: "👨‍👩‍👧" },
+      { text: "Мне важны семейные традиции", value: "family", emoji: "👨‍👩‍👧" },
+      { text: "Я доверяю своей семье", value: "family", emoji: "👨‍👩‍👧" },
+      { text: "У меня много друзей", value: "friendship", emoji: "👫" },
+      { text: "Я дорожу дружбой", value: "friendship", emoji: "👫" },
+      { text: "Я готов помочь другу", value: "friendship", emoji: "👫" },
+      { text: "Мне важно мнение друзей", value: "friendship", emoji: "👫" },
+      { text: "Я люблю гулять с друзьями", value: "friendship", emoji: "👫" },
+      { text: "Я люблю учиться", value: "study", emoji: "📚" },
+      { text: "Я стараюсь получать хорошие оценки", value: "study", emoji: "📚" },
+      { text: "Мне нравится узнавать новое", value: "study", emoji: "📚" },
+      { text: "Я читаю книги", value: "study", emoji: "📚" },
+      { text: "Я участвую в олимпиадах", value: "study", emoji: "📚" },
+      { text: "Я люблю рисовать", value: "creativity", emoji: "🎨" },
+      { text: "Я занимаюсь музыкой", value: "creativity", emoji: "🎨" },
+      { text: "Я люблю придумывать истории", value: "creativity", emoji: "🎨" },
+      { text: "Я посещаю творческие кружки", value: "creativity", emoji: "🎨" },
+      { text: "Я люблю мастерить", value: "creativity", emoji: "🎨" },
+      { text: "Я хочу заработать много денег", value: "finance", emoji: "💰" },
+      { text: "Я люблю копить", value: "finance", emoji: "💰" },
+      { text: "Мне важно, сколько стоят вещи", value: "finance", emoji: "💰" },
+      { text: "Я хочу свою фирму", value: "finance", emoji: "💰" },
+      { text: "Я интересуюсь бизнесом", value: "finance", emoji: "💰" },
+      { text: "Я хочу сам решать, что делать", value: "freedom", emoji: "🕊️" },
+      { text: "Я не люблю, когда меня заставляют", value: "freedom", emoji: "🕊️" },
+      { text: "Я хочу путешествовать", value: "freedom", emoji: "🕊️" },
+      { text: "Мне важно быть независимым", value: "freedom", emoji: "🕊️" },
+      { text: "Я хочу жить по своим правилам", value: "freedom", emoji: "🕊️" },
+      { text: "Я люблю помогать другим", value: "help", emoji: "🤝" },
+      { text: "Я забочусь о младших", value: "help", emoji: "🤝" },
+      { text: "Я готов делиться", value: "help", emoji: "🤝" },
+      { text: "Мне важно делать мир лучше", value: "help", emoji: "🤝" },
+      { text: "Я участвую в волонтёрстве", value: "help", emoji: "🤝" }
+    ]
+  },
+  lvi: {
+    title: "🌟 Жизненные ценности (LVI)",
+    scale: [1, 2, 3, 4, 5],
+    labels: ["Почти никогда", "Почти всегда"],
+    questions: [
+      { text: "Я ставлю цели и достигаю их", value: "achievement", emoji: "🏆" },
+      { text: "Я забочусь о других", value: "care", emoji: "❤️" },
+      { text: "Я придумываю что-то новое", value: "creativity", emoji: "🎨" },
+      { text: "Я планирую своё будущее", value: "planning", emoji: "📅" },
+      { text: "Я помогаю друзьям", value: "friendship", emoji: "👫" },
+      { text: "Я слежу за порядком", value: "order", emoji: "📐" },
+      { text: "Я учусь новому", value: "knowledge", emoji: "📚" },
+      { text: "Я отвечаю за свои поступки", value: "responsibility", emoji: "🎯" },
+      { text: "Я хочу быть здоровым", value: "health", emoji: "💪" },
+      { text: "Я работаю в команде", value: "teamwork", emoji: "🤝" },
+      { text: "Я коплю деньги", value: "finance", emoji: "💰" },
+      { text: "Я защищаю природу", value: "ecology", emoji: "🌱" },
+      { text: "Я честен с другими", value: "honesty", emoji: "✨" },
+      { text: "Я уважаю старших", value: "respect", emoji: "🙏" },
+      { text: "Я верю в себя", value: "confidence", emoji: "💫" },
+      { text: "Я развиваю свои таланты", value: "development", emoji: "🌟" },
+      { text: "Я мечтаю", value: "dreams", emoji: "🌙" },
+      { text: "Я помогаю дома", value: "family", emoji: "👨‍👩‍👧" },
+      { text: "Я соблюдаю правила", value: "discipline", emoji: "📏" },
+      { text: "Я делюсь с другими", value: "generosity", emoji: "🎁" },
+      { text: "Я радуюсь успехам друзей", value: "support", emoji: "🎉" }
+    ]
+  }
+};
+
+// Названия ценностей
+const VALUE_NAMES = {
+  achievement: "Достижение",
+  kindness: "Доброта",
+  creativity: "Творчество",
+  safety: "Безопасность",
+  power: "Лидерство",
+  knowledge: "Познание",
+  friendship: "Дружба",
+  dreams: "Мечты",
+  justice: "Справедливость",
+  recognition: "Признание",
+  intellect: "Интеллект",
+  family: "Семья",
+  freedom: "Свобода",
+  generosity: "Щедрость",
+  finance: "Финансы",
+  health: "Здоровье",
+  order: "Порядок",
+  expression: "Самовыражение",
+  support: "Поддержка",
+  honesty: "Честность",
+  study: "Учёба",
+  help: "Помощь другим",
+  care: "Забота",
+  planning: "Планирование",
+  responsibility: "Ответственность",
+  teamwork: "Командная работа",
+  ecology: "Экология",
+  respect: "Уважение",
+  confidence: "Уверенность",
+  development: "Развитие",
+  discipline: "Дисциплина"
+};
+
+// ============================================================
+// СОСТОЯНИЕ
+// ============================================================
+let state = {
+  currentTest: null,
+  currentQuestion: 0,
+  answers: [],
+  scores: {}
+};
+
+// ============================================================
+// НАВИГАЦИЯ
+// ============================================================
+function goToTestSelection() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('selection-screen').classList.add('active');
+}
+
+function goBackToStart() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('start-screen').classList.add('active');
+}
+
+// ============================================================
+// СТАРТ ТЕСТА
+// ============================================================
+function startTest(testKey) {
+  state.currentTest = testKey;
+  state.currentQuestion = 0;
+  state.answers = [];
+  state.scores = {};
+
+  const test = tests[testKey];
+
+  document.getElementById('test-title').textContent = test.title;
+  document.getElementById('total-q').textContent = test.questions.length;
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('question-screen').classList.add('active');
+
+  renderQuestion();
+}
+
+// ============================================================
+// ОТРИСОВКА ВОПРОСА
+// ============================================================
+function renderQuestion() {
+  const test = tests[state.currentTest];
+  const q = test.questions[state.currentQuestion];
+
+  document.getElementById('current-q').textContent = state.currentQuestion + 1;
+  document.getElementById('question-number').textContent = `ВОПРОС ${state.currentQuestion + 1}`;
+  document.getElementById('question-text').textContent = q.text;
+
+  // Прогресс
+  const percent = ((state.currentQuestion) / test.questions.length) * 100;
+  document.getElementById('question-progress').style.width = percent + '%';
+
+  // Шкала
+  const scaleContainer = document.getElementById('scale-options');
+  scaleContainer.innerHTML = '';
+
+  const scale = test.scale || [1, 2, 3, 4, 5];
+  scale.forEach(value => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'scale-btn';
+    btn.textContent = value;
+
+    if (state.answers[state.currentQuestion] === value) {
+      btn.classList.add('selected');
+    }
+
+    btn.onclick = () => selectAnswer(value);
+    scaleContainer.appendChild(btn);
+  });
+
+  // Метки
+  const labelsContainer = document.getElementById('scale-labels');
+  if (test.labels) {
+    labelsContainer.innerHTML = `<span>${test.labels[0]}</span><span>${test.labels[1]}</span>`;
+  } else {
+    labelsContainer.innerHTML = '<span>Совсем не похож</span><span>Очень похож</span>';
+  }
+
+  // Кнопки
+  document.getElementById('back-q-btn').disabled = state.currentQuestion === 0;
+  document.getElementById('next-q-btn').disabled = state.answers[state.currentQuestion] === undefined;
+
+  if (state.currentQuestion === test.questions.length - 1) {
+    document.getElementById('next-q-btn').textContent = '🏁 Завершить';
+  } else {
+    document.getElementById('next-q-btn').textContent = 'Далее →';
+  }
+}
+
+// ============================================================
+// ВЫБОР ОТВЕТА
+// ============================================================
+function selectAnswer(value) {
+  state.answers[state.currentQuestion] = value;
+
+  // Обновляем кнопки
+  document.querySelectorAll('.scale-btn').forEach(btn => {
+    btn.classList.toggle('selected', parseInt(btn.textContent) === value);
+  });
+
+  document.getElementById('next-q-btn').disabled = false;
+}
+
+// ============================================================
+// НАВИГАЦИЯ ПО ВОПРОСАМ
+// ============================================================
+function nextQuestion() {
+  const test = tests[state.currentTest];
+
+  if (state.answers[state.currentQuestion] === undefined) return;
+
+  if (state.currentQuestion < test.questions.length - 1) {
+    state.currentQuestion++;
+    renderQuestion();
+  } else {
+    finishTest();
+  }
+}
+
+function prevQuestion() {
+  if (state.currentQuestion > 0) {
+    state.currentQuestion--;
+    renderQuestion();
+  }
+}
+
+// ============================================================
+// ОБРАБОТКА РЕЗУЛЬТАТОВ
+// ============================================================
+function finishTest() {
+  const test = tests[state.currentTest];
+  const scores = {};
+
+  test.questions.forEach((q, i) => {
+    const answer = state.answers[i] || 0;
+    if (!scores[q.value]) {
+      scores[q.value] = { total: 0, count: 0, emoji: q.emoji };
+    }
+    scores[q.value].total += answer;
+    scores[q.value].count++;
+  });
+
+  // Вычисляем средние значения
+  const results = [];
+  Object.keys(scores).forEach(key => {
+    const avg = scores[key].total / scores[key].count;
+    results.push({
+      key: key,
+      name: VALUE_NAMES[key] || key,
+      emoji: scores[key].emoji,
+      score: Math.round(avg * 100) / 100,
+      maxScore: Math.max(...test.scale)
+    });
+  });
+
+  // Сортируем по убыванию
+  results.sort((a, b) => b.score - a.score);
+
+  // Показываем результат
+  showPortrait(results);
+}
+
+// ============================================================
+// ПОКАЗ ПОРТРЕТА
+// ============================================================
+function showPortrait(results) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('result-screen').classList.add('active');
+
+  const top3 = results.slice(0, 3);
+  const allResults = results;
+
+  // Заголовок
+  const emojis = top3.map(r => r.emoji).join('');
+  document.getElementById('portrait-emoji').textContent = emojis || '🌟';
+
+  const topNames = top3.map(r => r.name).join(' · ');
+  document.getElementById('portrait-title').textContent = `Твой портрет: ${topNames}`;
+
+  document.getElementById('portrait-subtitle').textContent = 
+    `Твои главные ценности — ${top3.map(r => r.name).join(', ')}. Это то, что ведёт тебя по жизни!`;
+
+  // Список ценностей
+  const listContainer = document.getElementById('values-list');
+  listContainer.innerHTML = '';
+
+  allResults.forEach((r, i) => {
+    const percent = (r.score / r.maxScore) * 100;
+    const row = document.createElement('div');
+    row.className = 'value-row' + (i < 3 ? ' top-value' : '');
+    row.innerHTML = `
+      <div class="value-emoji">${r.emoji}</div>
+      <div class="value-info">
+        <div class="value-name">${i + 1}. ${r.name}</div>
+        <div class="value-bar">
+          <div class="value-fill" style="width: ${percent}%"></div>
+        </div>
+      </div>
+      <div class="value-score">${r.score.toFixed(1)}</div>
+    `;
+    listContainer.appendChild(row);
+  });
+
+  // Описание
+  const description = generateDescription(top3, allResults);
+  document.getElementById('portrait-description').innerHTML = description;
+}
+
+// ============================================================
+// ГЕНЕРАЦИЯ ОПИСАНИЯ
+// ============================================================
+function generateDescription(top3, allResults) {
+  const top = top3[0];
+  let text = `<h3>📖 Что это значит?</h3>`;
+
+  text += `<p>Твоя самая сильная ценность — <strong>${top.emoji} ${top.name}</strong>. `;
+  text += `Это значит, что в жизни ты больше всего ценишь ${getValueDescription(top.key)}. `;
+  text += `Эта ценность ведёт тебя и помогает принимать решения.</p>`;
+
+  text += `<p><strong>Твои следующие по силе ценности:</strong> `;
+  text += top3.slice(1).map(r => `${r.emoji} ${r.name}`).join(', ');
+  text += `. Они дополняют твой характер и делают тебя уникальным.</p>`;
+
+  text += `<h3>💡 Как использовать это знание?</h3>`;
+  text += `<ul style="margin-left: 20px; line-height: 2;">`;
+  text += `<li>Выбирай занятия и хобби, которые соответствуют твоим ценностям.</li>`;
+  text += `<li>Когда принимаешь решение, спрашивай себя: «Соответствует ли это моим ценностям?»</li>`;
+  text += `<li>Обсуждай свои ценности с семьёй и друзьями — это помогает лучше понимать друг друга.</li>`;
+  text += `</ul>`;
+
+  text += `<h3>🌟 Совет от героя</h3>`;
+  text += `<p>«Знать свои ценности — это как иметь компас. Он всегда показывает, куда идти. Помни: <strong>умным быть — круто</strong>, а <strong>знать себя — ещё важнее</strong>!»</p>`;
+
+  return text;
+}
+
+function getValueDescription(key) {
+  const descriptions = {
+    achievement: "достижения и успех",
+    kindness: "доброту и заботу о других",
+    creativity: "творчество и новизну",
+    safety: "безопасность и стабильность",
+    power: "лидерство и влияние",
+    knowledge: "познание и обучение",
+    friendship: "дружбу и общение",
+    dreams: "мечты и воображение",
+    justice: "справедливость и защиту",
+    recognition: "признание и похвалу",
+    intellect: "интеллект и решение задач",
+    family: "семью и близких",
+    freedom: "свободу и независимость",
+    generosity: "щедрость и подарки",
+    finance: "финансы и достаток",
+    health: "здоровье и спорт",
+    order: "порядок и организованность",
+    expression: "самовыражение и творчество",
+    support: "поддержку и помощь",
+    honesty: "честность и правду",
+    study: "учёбу и знания",
+    help: "помощь другим",
+    care: "заботу о других",
+    planning: "планирование будущего",
+    responsibility: "ответственность",
+    teamwork: "командную работу",
+    ecology: "экологию и природу",
+    respect: "уважение к старшим",
+    confidence: "уверенность в себе",
+    development: "развитие талантов",
+    discipline: "дисциплину и порядок"
+  };
+  return descriptions[key] || "эту ценность";
+}
+
+// ============================================================
+// ПОДЕЛИТЬСЯ
+// ============================================================
+function sharePortrait() {
+  const title = document.getElementById('portrait-title').textContent;
+  const text = `🧭 Мой портрет ценностей!\n\n${title}\n\n🎓 Мягкая математика — Soft Skills, целеполагание, финансовая грамотность!\n📢 https://vk.com/smartskillsmaria`;
+
+  if (navigator.share) {
+    navigator.share({ title: 'Мой портрет ценностей', text: text }).catch(() => {});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Результат скопирован в буфер обмена!');
+    }).catch(() => {
+      alert(text);
+    });
+  } else {
+    alert(text);
+  }
+}
+
+// ============================================================
+// СБРОС
+// ============================================================
+function restartTest() {
+  if (!confirm('Начать тест заново? Все ответы будут сброшены.')) return;
+  startTest(state.currentTest);
+}
+
+function restartAll() {
+  state = {
+    currentTest: null,
+    currentQuestion: 0,
+    answers: [],
+    scores: {}
+  };
+  goToTestSelection();
+}
+
+console.log('🧭 Портрет ценностей загружен!');
+console.log('📢 Мягкая математика: https://vk.com/smartskillsmaria');
+</script>
+</body>
+</html>
